@@ -9,15 +9,14 @@
 <body>
 
 <div class="sidenav">
-
-  <h2 class="logout">Catalog App</h2>
-  <a href="#">category</a>
-  <a href="#">category</a>
-  <a href="#">category</a>
+  <h2 class="logo">Catalog App</h2>
+  <!-- loop thru catalogs -->
+  {% for catalog in catalogs %}
+    <a href="{{url_for('catalogItems', catalog_name = catalog.name )}}">{{ catalog.name }}</a>
+  {% endfor %}
   <div class="btnContainer">
-    <a href="#" class="logoutButton">logout</a>
+    <a href="#" class="loginButton">logout</a>
   </div>
-
 </div>
 
 <div class="main">
