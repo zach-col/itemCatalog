@@ -1,11 +1,8 @@
 {% extends "logout.html" %}
 {% block body %}
-<h1>Latest Items</h1>
+<h1>{{ catalog.name }}</h1>
   {% for item in catalogItems %}
-
-    <p>
-    <a href="">{{ item.name }}</a>
-    {{ item.catalog_id  }}
-    </p>
+    <p>{{ item.name }}</p>
+    <p>{{ item.description }}</p>
   {% endfor %}
 {% endblock %}

@@ -10,9 +10,10 @@
 
 <div class="sidenav">
   <h2 class="logo">Catalog App</h2>
-  <a href="#">category</a>
-  <a href="#">category</a>
-  <a href="#">category</a>
+  <!-- loop thru catalogs -->
+  {% for catalog in catalogs %}
+    <a href="#">{{ catalog.name }}</a>
+  {% endfor %}
   <div class="btnContainer">
     <a href="#" class="loginButton">login</a>
   </div>
