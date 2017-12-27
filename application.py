@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import render_template, url_for
+from flask import render_template, url_for, redirect, request
 app = Flask(__name__)
 
 from sqlalchemy import create_engine
@@ -63,6 +63,21 @@ def catalogItemInfo(catalog_id, catalog_item_id):
         catalogItem = session.query(CatalogItem).filter_by(catalog_id = catalog_id, id = catalog_item_id).one()
         return render_template('catalogItemInfoIn.html', catalogs = catalogs, catalog = catalog, catalogItem = catalogItem)
 
+# add new catalog item
+@app.route('/catalog/newItem', methods=['GET','POST'])
+def catalogNewItem():
+    # list for nav menu
+    catalogs = session.query(Catalog).all()
+    if request.method == 'POST':
+        newItem = CatalogItem(
+            name = request.form['name'],
+            description = request.form['description'],
+            catalog_id = request.form['catalog_id'])
+        session.add(newItem)
+        session.commit()
+        return redirect(url_for('catalogs'))
+    else:
+        return render_template('catalogNewItem.html', catalogs = catalogs)
 
 
 
