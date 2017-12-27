@@ -33,24 +33,36 @@ def catalogs():
 def catalogItems(catalog_id):
     # list for nav menu
     catalogs = session.query(Catalog).all()
-    catalog = session.query(Catalog).filter_by(id = catalog_id).one()
-    catalogItems = session.query(CatalogItem).filter_by(catalog_id = catalog_id).all()
-    catalogItemsCount = session.query(CatalogItem).filter_by(catalog_id = catalog.id).count()
-
-    return render_template('catalogItemOut.html', catalogs = catalogs, catalog = catalog, catalogItemsCount = catalogItemsCount, catalogItems = catalogItems)
+    # load logged out menu
+    if 1 > 20:
+        catalog = session.query(Catalog).filter_by(id = catalog_id).one()
+        catalogItems = session.query(CatalogItem).filter_by(catalog_id = catalog_id).all()
+        catalogItemsCount = session.query(CatalogItem).filter_by(catalog_id = catalog.id).count()
+        return render_template('catalogItemsOut.html', catalogs = catalogs, catalog = catalog, catalogItemsCount = catalogItemsCount, catalogItems = catalogItems)
+    else:
+        catalog = session.query(Catalog).filter_by(id = catalog_id).one()
+        catalogItems = session.query(CatalogItem).filter_by(catalog_id = catalog_id).all()
+        catalogItemsCount = session.query(CatalogItem).filter_by(catalog_id = catalog.id).count()
+        return render_template('catalogItemsIn.html', catalogs = catalogs, catalog = catalog, catalogItemsCount = catalogItemsCount, catalogItems = catalogItems)
 
 # info about specific item
 @app.route('/catalog/<int:catalog_id>/<int:catalog_item_id>/')
 def catalogItemInfo(catalog_id, catalog_item_id):
     # list for nav menu
     catalogs = session.query(Catalog).all()
-    # get catalog name
-    catalog = session.query(Catalog).filter_by(id = catalog_id).one()
-    # get catalog item
-    catalogItem = session.query(CatalogItem).filter_by(catalog_id = catalog_id, id = catalog_item_id).one()
-    return render_template('catalogItemInfoOut.html', catalogs = catalogs, catalog = catalog, catalogItem = catalogItem)
+    if 1 > 20:
+        # get catalog name
+        catalog = session.query(Catalog).filter_by(id = catalog_id).one()
+        # get catalog item
+        catalogItem = session.query(CatalogItem).filter_by(catalog_id = catalog_id, id = catalog_item_id).one()
+        return render_template('catalogItemInfoOut.html', catalogs = catalogs, catalog = catalog, catalogItem = catalogItem)
+    else:
+        # get catalog name
+        catalog = session.query(Catalog).filter_by(id = catalog_id).one()
+        # get catalog item
+        catalogItem = session.query(CatalogItem).filter_by(catalog_id = catalog_id, id = catalog_item_id).one()
+        return render_template('catalogItemInfoIn.html', catalogs = catalogs, catalog = catalog, catalogItem = catalogItem)
 
-# catalogs = catalogs, catalog = catalog, catalogItems = catalogItems
 
 
 

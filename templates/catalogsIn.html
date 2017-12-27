@@ -4,7 +4,7 @@
 <a href="#">Add Item</a></br>
   {% for item in catalogItems %}
 
-    <a href="#">{{ item.name }}</a>
+    <a href="{{url_for('catalogItemInfo', catalog_id = item.catalog_id, catalog_item_id = item.id)}}">{{ item.name }}</a>
     <p>
     {{ item.catalog_id  }}
     </p>
