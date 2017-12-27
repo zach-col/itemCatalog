@@ -12,7 +12,7 @@
   <h2 class="logo">Catalog App</h2>
   <!-- loop thru catalogs -->
   {% for catalog in catalogs %}
-    <a href="{{url_for('catalogItems', catalog_name = catalog.name )}}">{{ catalog.name }}</a>
+    <a href="{{url_for('catalogItems', catalog_id = catalog.id )}}">{{ catalog.name }}</a>
   {% endfor %}
   <div class="btnContainer">
     <a href="#" class="loginButton">logout</a>

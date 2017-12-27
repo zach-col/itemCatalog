@@ -12,10 +12,6 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-
-
-
-
 @app.route('/')
 @app.route('/catalogs')
 @app.route('/catalog')
@@ -33,32 +29,28 @@ def catalogs():
         return render_template('catalogsIn.html', catalogs = catalogs, catalogItems = catalogItems)
 
 # list all items of certain catalog
-@app.route('/catalog/<catalog_name>/')
-def catalogItems(catalog_name):
+@app.route('/catalog/<int:catalog_id>/')
+def catalogItems(catalog_id):
     # list for nav menu
     catalogs = session.query(Catalog).all()
-    catalog = session.query(Catalog).filter_by(name = catalog_name).one()
-    catalogItems = session.query(CatalogItem).filter_by(catalog_id = catalog.id).all()
+    catalog = session.query(Catalog).filter_by(id = catalog_id).one()
+    catalogItems = session.query(CatalogItem).filter_by(catalog_id = catalog_id).all()
     catalogItemsCount = session.query(CatalogItem).filter_by(catalog_id = catalog.id).count()
 
-    return render_template('catalogItemsOut.html',
-        catalogs = catalogs,
-        catalog = catalog,
-        catalogItems = catalogItems,
-        catalogItemsCount = catalogItemsCount)
+    return render_template('catalogItemOut.html', catalogs = catalogs, catalog = catalog, catalogItemsCount = catalogItemsCount, catalogItems = catalogItems)
 
 # info about specific item
-@app.route('/catalog/<catalog_name>/<catalog_item_name>/')
-def catalogItemInfo(catalog_name, catalog_item_name):
+@app.route('/catalog/<int:catalog_id>/<int:catalog_item_id>/')
+def catalogItemInfo(catalog_id, catalog_item_id):
     # list for nav menu
     catalogs = session.query(Catalog).all()
     # get catalog name
-    catalog = session.query(Catalog).filter_by(name = catalog_name).one()
-    # get catalog items
-    catalogItems = session.query(CatalogItem).filter_by(catalog_id = catalog.id).all()
-    return render_template('catalogItemOut.html', catalogs = catalogs, catalog = catalog, catalogItems = catalogItems)
+    catalog = session.query(Catalog).filter_by(id = catalog_id).one()
+    # get catalog item
+    catalogItem = session.query(CatalogItem).filter_by(catalog_id = catalog_id, id = catalog_item_id).one()
+    return render_template('catalogItemInfoOut.html', catalogs = catalogs, catalog = catalog, catalogItem = catalogItem)
 
-
+# catalogs = catalogs, catalog = catalog, catalogItems = catalogItems
 
 
 

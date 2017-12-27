@@ -1,8 +1,0 @@
-{% extends "logout.html" %}
-{% block body %}
-<h1>{{ catalog.name }}</h1>
-  {% for item in catalogItems %}
-    <p>{{ item.name }}</p>
-    <p>{{ item.description }}</p>
-  {% endfor %}
-{% endblock %}

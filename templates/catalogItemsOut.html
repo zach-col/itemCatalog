@@ -3,7 +3,7 @@
 <h1>{{ catalog.name }} Items ({{ catalogItemsCount}} items)</h1>
   {% for item in catalogItems %}
     <p>
-    <a href="{{url_for('catalogItemInfo', catalog=catalog, catalog_name = catalog.name, catalog_item_name = item.name)}}">{{ item.name }}</a>
+    <a href="#">{{ item.id }}</a>
     </p>
   {% endfor %}
 {% endblock %}

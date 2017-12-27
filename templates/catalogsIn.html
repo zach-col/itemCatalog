@@ -1,10 +1,10 @@
 {% extends "login.html" %}
 {% block body %}
 <h1>Latest Items</h1>
-<button>hi</button>
+<a href="#">Add Item</a></br>
   {% for item in catalogItems %}
 
-    <a href="{{url_for('catalogItemInfo',catalog_name = catalog.name, catalog_item_name = item.name)}}">{{ item.name }}</a>
+    <a href="#">{{ item.name }}</a>
     <p>
     {{ item.catalog_id  }}
     </p>
