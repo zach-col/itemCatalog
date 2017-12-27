@@ -1,10 +1,9 @@
 {% extends "logout.html" %}
 {% block body %}
-{{ lol }}
 <h1>{{ catalog.name }} Items ({{ catalogItemsCount}} items)</h1>
   {% for item in catalogItems %}
     <p>
-    <a href="">{{ item.name }}</a>
+    <a href="{{url_for('catalogItemInfo', catalog=catalog, catalog_name = catalog.name, catalog_item_name = item.name)}}">{{ item.name }}</a>
     </p>
   {% endfor %}
 {% endblock %}

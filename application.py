@@ -23,8 +23,14 @@ session = DBSession()
 def catalogs():
     # list for nav menu
     catalogs = session.query(Catalog).all()
-    catalogItems = session.query(CatalogItem).order_by("id asc").limit(10)
-    return render_template('catalogsOut.html', catalogs = catalogs, catalogItems = catalogItems)
+    # load items menu when logged out
+    if 1 > 20:
+        catalogItems = session.query(CatalogItem).order_by("id asc").limit(10)
+        return render_template('catalogsOut.html', catalogs = catalogs, catalogItems = catalogItems)
+    # load items menu with button when logged in
+    else:
+        catalogItems = session.query(CatalogItem).order_by("id asc").limit(10)
+        return render_template('catalogsIn.html', catalogs = catalogs, catalogItems = catalogItems)
 
 # list all items of certain catalog
 @app.route('/catalog/<catalog_name>/')
@@ -50,12 +56,6 @@ def catalogItemInfo(catalog_name, catalog_item_name):
     catalog = session.query(Catalog).filter_by(name = catalog_name).one()
     # get catalog items
     catalogItems = session.query(CatalogItem).filter_by(catalog_id = catalog.id).all()
-    # output = ""
-    # output += catalog.name
-    # for item in catalogItems:
-    #   output += item.name
-    #   output += item.description
-    # return output
     return render_template('catalogItemOut.html', catalogs = catalogs, catalog = catalog, catalogItems = catalogItems)
 
 
