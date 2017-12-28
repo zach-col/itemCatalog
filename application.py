@@ -97,6 +97,17 @@ def catalogEditItem(catalog_id, catalog_item_id):
     else:
         return render_template('catalogEditItem.html', catalogs = catalogs, editItem = editItem)
 
+# delete catalog item
+@app.route('/catalog/<int:catalog_id>/<int:catalog_item_id>/delete/', methods=['GET','POST'])
+def catalogDeleteItem(catalog_id, catalog_item_id):
+    # list for nav menu
+    catalogs = session.query(Catalog).all()
+    deleteItem = session.query(CatalogItem).filter_by(catalog_id = catalog_id, id = catalog_item_id).one()
+    if request.method == 'POST':
+        session.delete(deleteItem)
+        session.commit()
+        return redirect(url_for('catalogItems', catalog_id = catalog_id))
+    return render_template('catalogDeleteItem.html', catalogs = catalogs, deleteItem = deleteItem)
 
 
 

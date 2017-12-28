@@ -1,6 +1,6 @@
 {% extends "login.html" %}
 {% block body %}
-  <form action="#" method="post" class="form-horizontal">
+  <form action="{{ url_for('catalogEditItem', catalog_id = editItem.catalog.id, catalog_item_id = editItem.id) }}" method="post" class="form-horizontal">
     <div class="form-group">
       <label class="control-label col-sm-2" for="name">Name:</label>
 
