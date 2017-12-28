@@ -79,6 +79,23 @@ def catalogNewItem():
     else:
         return render_template('catalogNewItem.html', catalogs = catalogs)
 
+# edit catalog item
+@app.route('/catalog/<int:catalog_id>/<int:catalog_item_id>/edit/', methods=['GET','POST'])
+def catalogEditItem(catalog_id, catalog_item_id):
+    # list for nav menu
+    catalogs = session.query(Catalog).all()
+    # get catalog item to be edited
+    editItem = session.query(CatalogItem).filter_by(catalog_id = catalog_id, id = catalog_item_id).one()
+    if request.method == 'POST':
+        editItem.name = request.form['name']
+        editItem.description = request.form['description']
+        editItem.catalog_id = request.form['catalog_id']
+        editItem.id = catalog_item_id
+        session.add(editItem)
+        session.commit()
+        return redirect(url_for('catalogs'))
+    else:
+        return render_template('catalogEditItem.html', catalogs = catalogs, editItem = editItem)
 
 
 

@@ -5,7 +5,7 @@
 
     <p>
     <a href="{{url_for('catalogItemInfo', catalog_id = item.catalog_id, catalog_item_id = item.id)}}">{{ item.name }}</a>
-    Category {{ item.catalog_id  }}
+    Category {{ item.catalog.name  }}
     </p>
   {% endfor %}
 {% endblock %}

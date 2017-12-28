@@ -13,13 +13,21 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 catalog1 = Catalog(name="Football")
-
 session.add(catalog1)
 session.commit()
 
-catalogItem1 = CatalogItem(name="Helmet", description="helmet helps protect the brain", catalog=catalog1 )
 
+catalogItem1 = CatalogItem(name="Helmet", description="helmet helps protect the brain", catalog=catalog1 )
 session.add(catalogItem1)
+session.commit()
+
+catalog2 = Catalog(name="Baseball")
+session.add(catalog2)
+session.commit()
+
+
+catalogItem2 = CatalogItem(name="Baseball", description="Baseball us used to play the game", catalog=catalog2 )
+session.add(catalogItem2)
 session.commit()
 
 print "added catalog and catalog item"

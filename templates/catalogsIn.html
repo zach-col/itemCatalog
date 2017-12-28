@@ -6,7 +6,7 @@
 
     <a href="{{url_for('catalogItemInfo', catalog_id = item.catalog_id, catalog_item_id = item.id)}}">{{ item.name }}</a>
     <p>
-    {{ item.catalog_id  }}
+    {{ item.catalog.name  }}
     </p>
   {% endfor %}
 {% endblock %}
