@@ -9,7 +9,9 @@
 <body>
 
 <div class="sidenav">
+  <!-- logo -->
   <h2 class="logo">Catalog App</h2>
+  <a href="{{url_for('catalogs')}}">Home</a>
   <!-- loop thru catalogs -->
   {% for catalog in catalogs %}
     <a href="{{url_for('catalogItems', catalog_id = catalog.id )}}">{{ catalog.name }}</a>
