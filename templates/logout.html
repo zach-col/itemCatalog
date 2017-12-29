@@ -17,7 +17,7 @@
     <a href="{{url_for('catalogItems', catalog_id = catalog.id )}}">{{ catalog.name }}</a>
   {% endfor %}
   <div class="btnContainer">
-    <a href="#" class="loginButton">login</a>
+    <a href="{{url_for('showLogin', catalogs = catalogs)}}" class="loginButton">login</a>
   </div>
 </div>
 
