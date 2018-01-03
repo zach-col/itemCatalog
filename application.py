@@ -4,7 +4,7 @@ from flask import render_template, url_for, redirect, request, flash, jsonify
 # sql alchemy database importing database etc...
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, Catalog, CatalogItem
+from database_setup import Base, Catalog, CatalogItem, User
 
 # anti forgery state token imports
 from flask import session as login_session
@@ -117,6 +117,12 @@ def gconnect():
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
 
+    # check if user exist if it does not make a user
+    user_id = getUserID(login_session['email'])
+    if not user_id:
+        user_id = createUser(login_session)
+    login_session['user_id'] = user_id
+
     output = ''
     output += '<h1>Welcome, '
     output += login_session['username']
@@ -128,7 +134,7 @@ def gconnect():
         border-radius: 150px;
         -webkit-border-radius: 150px;
         -moz-border-radius: 150px;"> """
-    flash("you are now logged in as %s" % login_session['username'])
+    flash("you are now logged in %s" % login_session['username'])
     print "done!"
     return output
 
@@ -159,6 +165,7 @@ def gdisconnect():
         del login_session['picture']
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
+        flash("You have been logged out")
         return redirect('/catalogs')
     else:
         response = make_response(
@@ -176,7 +183,7 @@ def gdisconnect():
 def catalogs():
     # list for nav menu
     catalogs = session.query(Catalog).all()
-    catalogItems = session.query(CatalogItem).order_by("id asc").limit(10)
+    catalogItems = session.query(CatalogItem).order_by("id desc").limit(10)
 
     # load items menu when logged out
     if 'username' not in login_session:
@@ -198,7 +205,7 @@ def catalogItems(catalog_id):
 
     catalog = session.query(Catalog).filter_by(id=catalog_id).one()
     catalogItems = session.query(
-        CatalogItem).filter_by(catalog_id=catalog_id).all()
+        CatalogItem).filter_by(catalog_id=catalog_id).order_by("id desc").all()
     catalogItemsCount = session.query(
         CatalogItem).filter_by(catalog_id=catalog.id).count()
 
@@ -262,7 +269,8 @@ def catalogNewItem():
             newItem = CatalogItem(
                 name=request.form['name'],
                 description=request.form['description'],
-                catalog_id=request.form['catalog_id'])
+                catalog_id=request.form['catalog_id'],
+                user_id=login_session['user_id'])
             session.add(newItem)
             session.commit()
             return redirect(url_for('catalogs'))
@@ -279,8 +287,13 @@ def catalogEditItem(catalog_id, catalog_item_id):
     # get catalog item to be edited
     editItem = session.query(
         CatalogItem).filter_by(catalog_id=catalog_id, id=catalog_item_id).one()
-    if 'username' not in login_session:
+    # creator
+    creator = getUserInfo(editItem.user_id)
+    if 'username' not in login_session :
         return redirect('/login')
+    elif creator.id != login_session['user_id']:
+        flash("You can only edit items you have created")
+        return redirect('/catalogs')
     # load items menu with button when logged in
     else:
         if request.method == 'POST':
@@ -305,15 +318,18 @@ def catalogEditItem(catalog_id, catalog_item_id):
 def catalogDeleteItem(catalog_id, catalog_item_id):
     # list for nav menu
     catalogs = session.query(Catalog).all()
-
-    if 'username' not in login_session:
+    # item to delete
+    deleteItem = session.query(CatalogItem).filter_by(
+        catalog_id=catalog_id,
+        id=catalog_item_id).one()
+    # creator
+    creator = getUserInfo(deleteItem.user_id)
+    if 'username' not in login_session :
         return redirect('/login')
+    elif creator.id != login_session['user_id']:
+        flash("You can only delete items you have created")
+        return redirect('/catalogs')
     else:
-        # item to delete
-        deleteItem = session.query(CatalogItem).filter_by(
-            catalog_id=catalog_id,
-            id=catalog_item_id).one()
-
         if request.method == 'POST':
             session.delete(deleteItem)
             session.commit()
@@ -324,6 +340,27 @@ def catalogDeleteItem(catalog_id, catalog_item_id):
             deleteItem=deleteItem
         )
 
+# creates user
+def createUser(login_session):
+    newUser = User(name=login_session['username'], email=login_session[
+                   'email'], picture=login_session['picture'])
+    session.add(newUser)
+    session.commit()
+    user = session.query(User).filter_by(email=login_session['email']).one()
+    return user.id
+
+# gets user info
+def getUserInfo(user_id):
+    user = session.query(User).filter_by(id=user_id).one()
+    return user
+
+# gets user id
+def getUserID(email):
+    try:
+        user = session.query(User).filter_by(email=email).one()
+        return user.id
+    except:
+        return None
 
 # list all items of certain catalog in JSON format
 @app.route('/catalog/<int:catalog_id>/JSON/')
