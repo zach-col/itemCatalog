@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import render_template, url_for, redirect, request
+from flask import render_template, url_for, redirect, request, flash
 
 # sql alchemy database importing database etc...
 from sqlalchemy import create_engine
@@ -34,7 +34,7 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 # create state token to precent requests store it in session
-@app.route('/login/')
+@app.route('/login')
 def showLogin():
     # list for nav menu
     catalogs = session.query(Catalog).all()
@@ -43,7 +43,7 @@ def showLogin():
     login_session['state'] = state
     return render_template('googleSignIn.html', STATE=state, catalogs = catalogs)
 
-@app.route('/gconnect/', methods=['POST'])
+@app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
     if request.args.get('state') != login_session['state']:
@@ -126,7 +126,7 @@ def gconnect():
     print "done!"
     return output
 
-@app.route('/gdisconnect/')
+@app.route('/gdisconnect')
 def gdisconnect():
     access_token = login_session.get('access_token')
     if access_token is None:
@@ -165,13 +165,13 @@ def gdisconnect():
 def catalogs():
     # list for nav menu
     catalogs = session.query(Catalog).all()
+    catalogItems = session.query(CatalogItem).order_by("id asc").limit(10)
+
     # load items menu when logged out
-    if 100 > 20:
-        catalogItems = session.query(CatalogItem).order_by("id asc").limit(10)
+    if 'username' not in login_session:
         return render_template('catalogsOut.html', catalogs = catalogs, catalogItems = catalogItems)
     # load items menu with button when logged in
     else:
-        catalogItems = session.query(CatalogItem).order_by("id asc").limit(10)
         return render_template('catalogsIn.html', catalogs = catalogs, catalogItems = catalogItems)
 
 # list all items of certain catalog
@@ -179,16 +179,16 @@ def catalogs():
 def catalogItems(catalog_id):
     # list for nav menu
     catalogs = session.query(Catalog).all()
-    # load logged out menu
-    if 100 > 20:
-        catalog = session.query(Catalog).filter_by(id = catalog_id).one()
-        catalogItems = session.query(CatalogItem).filter_by(catalog_id = catalog_id).all()
-        catalogItemsCount = session.query(CatalogItem).filter_by(catalog_id = catalog.id).count()
+
+    catalog = session.query(Catalog).filter_by(id = catalog_id).one()
+    catalogItems = session.query(CatalogItem).filter_by(catalog_id = catalog_id).all()
+    catalogItemsCount = session.query(CatalogItem).filter_by(catalog_id = catalog.id).count()
+
+
+    if 'username' not in login_session:
         return render_template('catalogItemsOut.html', catalogs = catalogs, catalog = catalog, catalogItemsCount = catalogItemsCount, catalogItems = catalogItems)
+    # load items menu with button when logged in
     else:
-        catalog = session.query(Catalog).filter_by(id = catalog_id).one()
-        catalogItems = session.query(CatalogItem).filter_by(catalog_id = catalog_id).all()
-        catalogItemsCount = session.query(CatalogItem).filter_by(catalog_id = catalog.id).count()
         return render_template('catalogItemsIn.html', catalogs = catalogs, catalog = catalog, catalogItemsCount = catalogItemsCount, catalogItems = catalogItems)
 
 # info about specific item
@@ -196,34 +196,37 @@ def catalogItems(catalog_id):
 def catalogItemInfo(catalog_id, catalog_item_id):
     # list for nav menu
     catalogs = session.query(Catalog).all()
-    if 100 > 20:
-        # get catalog name
-        catalog = session.query(Catalog).filter_by(id = catalog_id).one()
-        # get catalog item
-        catalogItem = session.query(CatalogItem).filter_by(catalog_id = catalog_id, id = catalog_item_id).one()
+    # get catalog name
+    catalog = session.query(Catalog).filter_by(id = catalog_id).one()
+    # get catalog item
+    catalogItem = session.query(CatalogItem).filter_by(catalog_id = catalog_id, id = catalog_item_id).one()
+
+    if 'username' not in login_session:
         return render_template('catalogItemInfoOut.html', catalogs = catalogs, catalog = catalog, catalogItem = catalogItem)
+    # load items menu with button when logged in
     else:
-        # get catalog name
-        catalog = session.query(Catalog).filter_by(id = catalog_id).one()
-        # get catalog item
-        catalogItem = session.query(CatalogItem).filter_by(catalog_id = catalog_id, id = catalog_item_id).one()
         return render_template('catalogItemInfoIn.html', catalogs = catalogs, catalog = catalog, catalogItem = catalogItem)
 
 # add new catalog item
-@app.route('/catalog/newItem', methods=['GET','POST'])
+@app.route('/catalog/newItem/', methods=['GET','POST'])
 def catalogNewItem():
     # list for nav menu
     catalogs = session.query(Catalog).all()
-    if request.method == 'POST':
-        newItem = CatalogItem(
-            name = request.form['name'],
-            description = request.form['description'],
-            catalog_id = request.form['catalog_id'])
-        session.add(newItem)
-        session.commit()
-        return redirect(url_for('catalogs'))
+    # load items menu when logged out
+    if 'username' not in login_session:
+        return redirect('/login')
     else:
-        return render_template('catalogNewItem.html', catalogs = catalogs)
+        if request.method == 'POST':
+            newItem = CatalogItem(
+                name = request.form['name'],
+                description = request.form['description'],
+                catalog_id = request.form['catalog_id'])
+            session.add(newItem)
+            session.commit()
+            return redirect(url_for('catalogs'))
+        else:
+            return render_template('catalogNewItem.html', catalogs = catalogs)
+
 
 # edit catalog item
 @app.route('/catalog/<int:catalog_id>/<int:catalog_item_id>/edit/', methods=['GET','POST'])
@@ -232,28 +235,40 @@ def catalogEditItem(catalog_id, catalog_item_id):
     catalogs = session.query(Catalog).all()
     # get catalog item to be edited
     editItem = session.query(CatalogItem).filter_by(catalog_id = catalog_id, id = catalog_item_id).one()
-    if request.method == 'POST':
-        editItem.name = request.form['name']
-        editItem.description = request.form['description']
-        editItem.catalog_id = request.form['catalog_id']
-        editItem.id = catalog_item_id
-        session.add(editItem)
-        session.commit()
-        return redirect(url_for('catalogs'))
+
+    if 'username' not in login_session:
+        return redirect('/login')
+    # load items menu with button when logged in
     else:
-        return render_template('catalogEditItem.html', catalogs = catalogs, editItem = editItem)
+        if request.method == 'POST':
+            editItem.name = request.form['name']
+            editItem.description = request.form['description']
+            editItem.catalog_id = request.form['catalog_id']
+            editItem.id = catalog_item_id
+            session.add(editItem)
+            session.commit()
+            return redirect(url_for('catalogs'))
+        else:
+            return render_template('catalogEditItem.html', catalogs = catalogs, editItem = editItem)
+
+
 
 # delete catalog item
 @app.route('/catalog/<int:catalog_id>/<int:catalog_item_id>/delete/', methods=['GET','POST'])
 def catalogDeleteItem(catalog_id, catalog_item_id):
     # list for nav menu
     catalogs = session.query(Catalog).all()
-    deleteItem = session.query(CatalogItem).filter_by(catalog_id = catalog_id, id = catalog_item_id).one()
-    if request.method == 'POST':
-        session.delete(deleteItem)
-        session.commit()
-        return redirect(url_for('catalogItems', catalog_id = catalog_id))
-    return render_template('catalogDeleteItem.html', catalogs = catalogs, deleteItem = deleteItem)
+
+    if 'username' not in login_session:
+        return redirect('/login')
+    else:
+        # item to delete
+        deleteItem = session.query(CatalogItem).filter_by(catalog_id = catalog_id, id = catalog_item_id).one()
+        if request.method == 'POST':
+            session.delete(deleteItem)
+            session.commit()
+            return redirect(url_for('catalogItems', catalog_id = catalog_id))
+        return render_template('catalogDeleteItem.html', catalogs = catalogs, deleteItem = deleteItem)
 
 
 
