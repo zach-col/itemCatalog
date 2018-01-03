@@ -1,4 +1,3 @@
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -17,7 +16,12 @@ session.add(catalog1)
 session.commit()
 
 
-catalogItem1 = CatalogItem(name="Helmet", description="helmet helps protect the brain", catalog=catalog1 )
+catalogItem1 = CatalogItem(
+    name="Helmet",
+    description="helmet helps protect the brain",
+    catalog=catalog1
+)
+
 session.add(catalogItem1)
 session.commit()
 
@@ -26,7 +30,11 @@ session.add(catalog2)
 session.commit()
 
 
-catalogItem2 = CatalogItem(name="Baseball", description="Baseball us used to play the game", catalog=catalog2 )
+catalogItem2 = CatalogItem(
+    name="Baseball",
+    description="Baseball us used to play the game",
+    catalog=catalog2
+)
 session.add(catalogItem2)
 session.commit()
 

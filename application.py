@@ -32,6 +32,7 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+
 # create state token to precent requests store it in session
 @app.route('/login')
 def showLogin():
@@ -40,7 +41,8 @@ def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
-    return render_template('googleSignIn.html', STATE=state, catalogs = catalogs)
+    return render_template('googleSignIn.html', STATE=state, catalogs=catalogs)
+
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
@@ -94,8 +96,9 @@ def gconnect():
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
-                                 200)
+        response = make_response(
+            json.dumps('Current user is already connected.'), 200
+        )
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -120,17 +123,24 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += """ " style = "width: 300px;
+        height: 300px;
+        border-radius: 150px;
+        -webkit-border-radius: 150px;
+        -moz-border-radius: 150px;"> """
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
+
 
 @app.route('/gdisconnect')
 def gdisconnect():
     access_token = login_session.get('access_token')
     if access_token is None:
         print 'Access Token is None'
-        response = make_response(json.dumps('Current user not connected.'), 401)
+        response = make_response(
+            json.dumps('Current user not connected.'), 401
+        )
         response.headers['Content-Type'] = 'application/json'
         return response
     print 'In gdisconnect access token is %s', access_token
@@ -151,9 +161,12 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     else:
-        response = make_response(json.dumps('Failed to revoke token for given user.', 400))
+        response = make_response(
+            json.dumps('Failed to revoke token for given user.', 400)
+        )
         response.headers['Content-Type'] = 'application/json'
         return response
+
 
 # home page lists recently created items
 @app.route('/')
@@ -167,10 +180,15 @@ def catalogs():
 
     # load items menu when logged out
     if 'username' not in login_session:
-        return render_template('catalogsOut.html', catalogs = catalogs, catalogItems = catalogItems)
+        return render_template(
+            'catalogsOut.html', catalogs=catalogs, catalogItems=catalogItems
+        )
     # load items menu with button when logged in
     else:
-        return render_template('catalogsIn.html', catalogs = catalogs, catalogItems = catalogItems)
+        return render_template(
+            'catalogsIn.html', catalogs=catalogs, catalogItems=catalogItems
+        )
+
 
 # list all items of certain catalog
 @app.route('/catalog/<int:catalog_id>/')
@@ -178,15 +196,30 @@ def catalogItems(catalog_id):
     # list for nav menu
     catalogs = session.query(Catalog).all()
 
-    catalog = session.query(Catalog).filter_by(id = catalog_id).one()
-    catalogItems = session.query(CatalogItem).filter_by(catalog_id = catalog_id).all()
-    catalogItemsCount = session.query(CatalogItem).filter_by(catalog_id = catalog.id).count()
+    catalog = session.query(Catalog).filter_by(id=catalog_id).one()
+    catalogItems = session.query(
+        CatalogItem).filter_by(catalog_id=catalog_id).all()
+    catalogItemsCount = session.query(
+        CatalogItem).filter_by(catalog_id=catalog.id).count()
 
     if 'username' not in login_session:
-        return render_template('catalogItemsOut.html', catalogs = catalogs, catalog = catalog, catalogItemsCount = catalogItemsCount, catalogItems = catalogItems)
+        return render_template(
+            'catalogItemsOut.html',
+            catalogs=catalogs,
+            catalog=catalog,
+            catalogItemsCount=catalogItemsCount,
+            catalogItems=catalogItems
+        )
     # load items menu with button when logged in
     else:
-        return render_template('catalogItemsIn.html', catalogs = catalogs, catalog = catalog, catalogItemsCount = catalogItemsCount, catalogItems = catalogItems)
+        return render_template(
+            'catalogItemsIn.html',
+            catalogs=catalogs,
+            catalog=catalog,
+            catalogItemsCount=catalogItemsCount,
+            catalogItems=catalogItems
+        )
+
 
 # info about specific item
 @app.route('/catalog/<int:catalog_id>/<int:catalog_item_id>/')
@@ -194,18 +227,30 @@ def catalogItemInfo(catalog_id, catalog_item_id):
     # list for nav menu
     catalogs = session.query(Catalog).all()
     # get catalog name
-    catalog = session.query(Catalog).filter_by(id = catalog_id).one()
+    catalog = session.query(Catalog).filter_by(id=catalog_id).one()
     # get catalog item
-    catalogItem = session.query(CatalogItem).filter_by(catalog_id = catalog_id, id = catalog_item_id).one()
+    catalogItem = session.query(
+        CatalogItem).filter_by(catalog_id=catalog_id, id=catalog_item_id).one()
 
     if 'username' not in login_session:
-        return render_template('catalogItemInfoOut.html', catalogs = catalogs, catalog = catalog, catalogItem = catalogItem)
+        return render_template(
+            'catalogItemInfoOut.html',
+            catalogs=catalogs,
+            catalog=catalog,
+            catalogItem=catalogItem
+        )
     # load items menu with button when logged in
     else:
-        return render_template('catalogItemInfoIn.html', catalogs = catalogs, catalog = catalog, catalogItem = catalogItem)
+        return render_template(
+            'catalogItemInfoIn.html',
+            catalogs=catalogs,
+            catalog=catalog,
+            catalogItem=catalogItem
+        )
+
 
 # add new catalog item
-@app.route('/catalog/newItem/', methods=['GET','POST'])
+@app.route('/catalog/newItem/', methods=['GET', 'POST'])
 def catalogNewItem():
     # list for nav menu
     catalogs = session.query(Catalog).all()
@@ -215,23 +260,25 @@ def catalogNewItem():
     else:
         if request.method == 'POST':
             newItem = CatalogItem(
-                name = request.form['name'],
-                description = request.form['description'],
-                catalog_id = request.form['catalog_id'])
+                name=request.form['name'],
+                description=request.form['description'],
+                catalog_id=request.form['catalog_id'])
             session.add(newItem)
             session.commit()
             return redirect(url_for('catalogs'))
         else:
-            return render_template('catalogNewItem.html', catalogs = catalogs)
+            return render_template('catalogNewItem.html', catalogs=catalogs)
+
 
 # edit catalog item
-@app.route('/catalog/<int:catalog_id>/<int:catalog_item_id>/edit/', methods=['GET','POST'])
+@app.route('/catalog/<int:catalog_id>/<int:catalog_item_id>/edit/',
+           methods=['GET', 'POST'])
 def catalogEditItem(catalog_id, catalog_item_id):
     # list for nav menu
     catalogs = session.query(Catalog).all()
     # get catalog item to be edited
-    editItem = session.query(CatalogItem).filter_by(catalog_id = catalog_id, id = catalog_item_id).one()
-
+    editItem = session.query(
+        CatalogItem).filter_by(catalog_id=catalog_id, id=catalog_item_id).one()
     if 'username' not in login_session:
         return redirect('/login')
     # load items menu with button when logged in
@@ -245,10 +292,16 @@ def catalogEditItem(catalog_id, catalog_item_id):
             session.commit()
             return redirect(url_for('catalogs'))
         else:
-            return render_template('catalogEditItem.html', catalogs = catalogs, editItem = editItem)
+            return render_template(
+                'catalogEditItem.html',
+                catalogs=catalogs,
+                editItem=editItem
+            )
+
 
 # delete catalog item
-@app.route('/catalog/<int:catalog_id>/<int:catalog_item_id>/delete/', methods=['GET','POST'])
+@app.route('/catalog/<int:catalog_id>/<int:catalog_item_id>/delete/',
+           methods=['GET', 'POST'])
 def catalogDeleteItem(catalog_id, catalog_item_id):
     # list for nav menu
     catalogs = session.query(Catalog).all()
@@ -257,29 +310,30 @@ def catalogDeleteItem(catalog_id, catalog_item_id):
         return redirect('/login')
     else:
         # item to delete
-        deleteItem = session.query(CatalogItem).filter_by(catalog_id = catalog_id, id = catalog_item_id).one()
+        deleteItem = session.query(CatalogItem).filter_by(
+            catalog_id=catalog_id,
+            id=catalog_item_id).one()
+
         if request.method == 'POST':
             session.delete(deleteItem)
             session.commit()
-            return redirect(url_for('catalogItems', catalog_id = catalog_id))
-        return render_template('catalogDeleteItem.html', catalogs = catalogs, deleteItem = deleteItem)
+            return redirect(url_for('catalogItems', catalog_id=catalog_id))
+        return render_template(
+            'catalogDeleteItem.html',
+            catalog=catalogs,
+            deleteItem=deleteItem
+        )
+
 
 # list all items of certain catalog in JSON format
 @app.route('/catalog/<int:catalog_id>/JSON/')
 def catalogItemsJSON(catalog_id):
 
-    catalog = session.query(Catalog).filter_by(id = catalog_id).one()
-    items = session.query(CatalogItem).filter_by(catalog_id = catalog_id).all()
+    catalog = session.query(Catalog).filter_by(id=catalog_id).one()
+    items = session.query(CatalogItem).filter_by(catalog_id=catalog_id).all()
     return jsonify(CatalogItems=[i.serialize for i in items])
 
-
-
-
-
-
-
-
 if __name__ == '__main__':
-     app.secret_key = 'super_secret_key'
-     app.debug = True
-     app.run(host = '0.0.0.0', port = 5000)
+    app.secret_key = 'super_secret_key'
+    app.debug = True
+    app.run(host='0.0.0.0', port=5000)

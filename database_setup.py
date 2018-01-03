@@ -7,12 +7,14 @@ from sqlalchemy import create_engine
 
 Base = declarative_base()
 
+
 # class for each catalog
 class Catalog(Base):
     __tablename__ = 'catalog'
 
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
+
 
 class CatalogItem(Base):
     __tablename__ = 'catalog_item'
@@ -32,9 +34,6 @@ class CatalogItem(Base):
             'id': self.id,
             'catalog_id': self.catalog_id
         }
-
-
-
 
 engine = create_engine('sqlite:///catalog.db')
 
