@@ -1,12 +1,17 @@
 {% extends "login.html" %}
 {% block body %}
-<h1>Latest Items</h1>
+<!-- add item link -->
 <a href="{{url_for('catalogNewItem', catalogs = catalogs)}}">Add Item</a></br>
-  {% for item in catalogItems %}
+<!-- main header -->
+<h1 class="black">Latest Items</h1>
 
-    <a href="{{url_for('catalogItemInfo', catalog_id = item.catalog_id, catalog_item_id = item.id)}}">{{ item.name }}</a>
+  {% for item in catalogItems %}
+    <!-- catalog item name -->
     <p>
-    {{ item.catalog.name  }}
+    <a href="{{url_for('catalogItemInfo', catalog_id = item.catalog_id, catalog_item_id = item.id)}}" class="catalogItem">{{ item.name }}</a>
     </p>
+    <!-- catalog name -->
+    <p>Category {{ item.catalog.name  }}</p>
+    </br>
   {% endfor %}
 {% endblock %}

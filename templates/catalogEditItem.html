@@ -1,6 +1,7 @@
 {% extends "login.html" %}
 {% block body %}
   <form action="{{ url_for('catalogEditItem', catalog_id = editItem.catalog.id, catalog_item_id = editItem.id) }}" method="post" class="form-horizontal">
+    <!-- item name -->
     <div class="form-group">
       <label class="control-label col-sm-2" for="name">Name:</label>
 
@@ -8,7 +9,7 @@
         <input type="text" size="30" class="form-control" placeholder="Enter Name" name="name" value="{{ editItem.name }}">
       </div>
     </div>
-
+    <!-- item description -->
     <div class="form-group">
       <label class="control-label col-sm-2" for="description">Description:</label>
 
@@ -26,9 +27,9 @@
         </label>
       {% endfor %}
     </div>
-
+      <!-- submit form button -->
       <button type="submit" class="btn btn-primary">Submit</button>
-
+      <!-- cancel link -->
       <a href="{{ url_for('catalogs', catalogs = catalogs)}}" class="cancelLink">Cancel</a>
 
 </form>

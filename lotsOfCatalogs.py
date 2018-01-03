@@ -18,7 +18,7 @@ session.commit()
 
 catalogItem1 = CatalogItem(
     name="Helmet",
-    description="helmet helps protect the brain",
+    description="The Helmet helps protect the brain",
     catalog=catalog1
 )
 
@@ -32,7 +32,7 @@ session.commit()
 
 catalogItem2 = CatalogItem(
     name="Baseball",
-    description="Baseball us used to play the game",
+    description="The Baseball is used to play baseball",
     catalog=catalog2
 )
 session.add(catalogItem2)

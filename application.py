@@ -159,7 +159,7 @@ def gdisconnect():
         del login_session['picture']
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
-        return response
+        return redirect('/catalogs')
     else:
         response = make_response(
             json.dumps('Failed to revoke token for given user.', 400)
@@ -320,7 +320,7 @@ def catalogDeleteItem(catalog_id, catalog_item_id):
             return redirect(url_for('catalogItems', catalog_id=catalog_id))
         return render_template(
             'catalogDeleteItem.html',
-            catalog=catalogs,
+            catalogs=catalogs,
             deleteItem=deleteItem
         )
 
