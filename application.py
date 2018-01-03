@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import render_template, url_for, redirect, request, flash
+from flask import render_template, url_for, redirect, request, flash, jsonify
 
 # sql alchemy database importing database etc...
 from sqlalchemy import create_engine
@@ -20,7 +20,6 @@ from flask import make_response
 import requests
 
 app = Flask(__name__)
-
 
 # google client id
 CLIENT_ID = json.loads(
@@ -156,7 +155,6 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
-
 # home page lists recently created items
 @app.route('/')
 @app.route('/catalogs')
@@ -183,7 +181,6 @@ def catalogItems(catalog_id):
     catalog = session.query(Catalog).filter_by(id = catalog_id).one()
     catalogItems = session.query(CatalogItem).filter_by(catalog_id = catalog_id).all()
     catalogItemsCount = session.query(CatalogItem).filter_by(catalog_id = catalog.id).count()
-
 
     if 'username' not in login_session:
         return render_template('catalogItemsOut.html', catalogs = catalogs, catalog = catalog, catalogItemsCount = catalogItemsCount, catalogItems = catalogItems)
@@ -227,7 +224,6 @@ def catalogNewItem():
         else:
             return render_template('catalogNewItem.html', catalogs = catalogs)
 
-
 # edit catalog item
 @app.route('/catalog/<int:catalog_id>/<int:catalog_item_id>/edit/', methods=['GET','POST'])
 def catalogEditItem(catalog_id, catalog_item_id):
@@ -251,8 +247,6 @@ def catalogEditItem(catalog_id, catalog_item_id):
         else:
             return render_template('catalogEditItem.html', catalogs = catalogs, editItem = editItem)
 
-
-
 # delete catalog item
 @app.route('/catalog/<int:catalog_id>/<int:catalog_item_id>/delete/', methods=['GET','POST'])
 def catalogDeleteItem(catalog_id, catalog_item_id):
@@ -270,6 +264,13 @@ def catalogDeleteItem(catalog_id, catalog_item_id):
             return redirect(url_for('catalogItems', catalog_id = catalog_id))
         return render_template('catalogDeleteItem.html', catalogs = catalogs, deleteItem = deleteItem)
 
+# list all items of certain catalog in JSON format
+@app.route('/catalog/<int:catalog_id>/JSON/')
+def catalogItemsJSON(catalog_id):
+
+    catalog = session.query(Catalog).filter_by(id = catalog_id).one()
+    items = session.query(CatalogItem).filter_by(catalog_id = catalog_id).all()
+    return jsonify(CatalogItems=[i.serialize for i in items])
 
 
 
