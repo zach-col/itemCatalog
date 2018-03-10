@@ -4,6 +4,7 @@ from flask import render_template, url_for, redirect, request, flash, jsonify
 # sql alchemy database importing database etc...
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import desc
 from database_setup import Base, Catalog, CatalogItem, User
 
 # anti forgery state token imports
